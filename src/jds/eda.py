@@ -79,8 +79,9 @@ FUNNEL_EDGES = (0, 1, 3, 7, 14, 30, 90, 180, 365, 10_000)
 def funnel_by_age(history: pl.DataFrame, edges=FUNNEL_EDGES) -> pl.DataFrame:
     """Interim feedback: elapsed days before the test query vs the click / cart / order funnel.
 
-    A normal funnel has clicks:carts around 5-10 and carts:orders around 3-5. Inside the 7-day click window the
-    ratios look like that; beyond it clicks drop to ~0 (not recorded) and beyond 90 days carts do too.
+    The same 0-7-day window has about 6.22 clicks/cart and 6.58 carts/order.
+    These are event-count ratios, not user-level conversion rates. After 7 days
+    clicks fall almost to zero; after 90 days carts do too.
     """
     labels = [f"{a}-{b}" if b < 10_000 else f"{a}+" for a, b in zip(edges[:-1], edges[1:])]
     h = history.with_columns(bucket=pl.col("age_days").cut(list(edges[1:-1]), labels=labels, left_closed=True))

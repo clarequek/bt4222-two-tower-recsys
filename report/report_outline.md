@@ -24,10 +24,9 @@ normal margins · single column. Due **Tue 10 Nov, 11:59 PM** (.pdf or .docx on 
 Don't repeat the interim report: focus on what changed and what's new.
 
 1. **History timeline (interim feedback).**
-   - Figures: `history_timeline.png`, `funnel_by_age.png`.
-   - Table: `eda_funnel_by_age.csv`, with clicks per cart and carts per order by elapsed days.
-   - Numbers: `eda.json → missing_clicks` (share of carts and orders that predate the click window; users with orders but no clicks) and `recency_confound`.
-   - *[Explain what the pattern means, and why "no click" beyond 7 days is missing data, not behaviour.]*
+   - Reproducible evidence: `notebooks/step1b_history_feedback_eda.ipynb` (four saved plots and full-file counts); source calculations in `scripts/01b_history_feedback_eda.py`.
+   - The same 0–7-day window has 6.22 clicks per cart and 6.58 carts per order. These are action-count ratios, not conversion rates. The 107 clicks older than 7 days and 1,204 carts older than 90 days are small exceptions to the observed horizons.
+   - 25,432 users have an order but no recorded click; the click fraction correlates 0.953 with the share of each user's history in the last seven days. Explain why older missing clicks are mainly a coverage gap, then show how this changed the features.
 2. **What that changed in the features.** Per-type windowed counts; no mixed-type ratios; short/mid/long tower segments.
    - Evidence: `window_ablation.csv` and `window_ablation.png`.
    - *[Interpret the gap between windowed and naive, and the per-segment panel.]*

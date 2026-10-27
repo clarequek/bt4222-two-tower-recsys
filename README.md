@@ -40,6 +40,7 @@ Everything runs from the command line (`scripts/`) or, stage by stage, from the 
 | notebook | stages | runtime |
 |---|---|---|
 | `step1_data_preprocess_eda.ipynb` | parse, leakage fix, split; EDA incl. funnel by elapsed days | CPU |
+| `step1b_history_feedback_eda.ipynb` | full-file timeline audit, exact age buckets, field roles and modelling implications | CPU |
 | `step2_features_baselines.ipynb` | ~105 features; non-learned baselines | CPU, ~6 GB RAM |
 | `step3_prior_baseline_ncf.ipynb` | previous team's Hybrid NCF + LSTM and its gap diagnosis | GPU |
 | `step4_window_ablation.ipynb` | same ranker on windowed vs naive history features | CPU |
@@ -159,9 +160,10 @@ paper's), plus graded NDCG@10 (gain 2^label − 1), HR@10 and recall@k.
 
 ### The history is three logs with different retention windows
 
-Counted back from each user's test query, **clicks are kept only for 7 days, carts and follows for 90 days, orders for
-365 days** (99.9% of clicks are < 7 days old; every order is < 365 days old; `01_eda.py` plots this as
-`figures/history_timeline.png`). Beyond 7 days, "no click" means "not recorded", not "did not click". So:
+Counted back from each user's test query, **almost all clicks fall within 7 days, carts and follows within 90 days,
+and orders within 365 days**. The full-file audit in `notebooks/step1b_history_feedback_eda.ipynb` finds 107 clicks
+at least 7 days old and 1,204 carts at least 90 days old. These are empirical recording horizons, not documented
+platform rules. For older history, "no click" is primarily a coverage gap, not evidence that the user did not click. So:
 
 - every history count is computed **per event type inside that type's own window** (`click_7`, `cart_7`, `cart_90`,
   `order_7`, `order_90`, `order_365`, `follow_90`) plus *days since the last event*; no mixing of types with decay
