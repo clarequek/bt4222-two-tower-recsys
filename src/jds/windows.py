@@ -1,9 +1,9 @@
 """Retention windows of the JDsearch history log.
 
-The history is not one continuous log: counted back from each user's test query, clicks are only retained for
-7 days, carts and follows for 90 days and orders for 365 days (verified on the full data: 99.9% of clicks are
-under 7 days old, of carts under 90, every order within 365). Inside the 7-day window the funnel is normal
-(~85% clicks, 13% carts, 2% orders); beyond it, "no click" means "not recorded", not "did not click".
+The history is not one continuous log: counted back from each user's test query, almost all clicks fall within
+7 days, carts and follows within 90 days, and orders within 365 days. The full-file audit finds small exceptions:
+107 clicks at least 7 days old and 1,204 carts at least 90 days old. These are observed horizons, not a documented
+retention policy. Beyond 7 days, "no click" is mostly a coverage gap, not evidence the user did not click.
 
 Consequences encoded here:
   * a count is only meaningful for an event type inside that type's own window -> `feature_windows`;
@@ -25,7 +25,7 @@ def type_window_days(cfg: dict) -> dict[int, float]:
 
 
 def feature_windows(cfg: dict) -> list[tuple[str, int, float]]:
-    """(name, type code, max age in days) for every count that is complete inside its retention window.
+    """(name, type code, max age in days) for counts inside each observed history window.
 
     Shorter windows of the long-lived types (carts and orders in the last 7 days) are comparable with clicks; the
     longer ones carry the extra history that only those types have.
