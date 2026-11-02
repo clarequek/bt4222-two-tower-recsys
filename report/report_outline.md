@@ -41,7 +41,7 @@ Don't repeat the interim report: focus on what changed and what's new.
 
 1. **Architecture diagrams:**
    - pipeline data flow (start from the mermaid chart in the README);
-   - the two-tower model: item tower, query + user tower, 3 attention-pooled history segments;
+   - the two-tower model: item tower, query + user tower, candidate-aware attention over short history; counts and match flags for all three segments;
    - cross-fitting: which fold model scores whom.
 2. **Sample splits:**
    - 80/10/10 split by user, seed 42; only users with a positive are evaluated;

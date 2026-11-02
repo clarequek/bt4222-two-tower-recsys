@@ -31,7 +31,8 @@ def run(cfg: dict) -> pl.DataFrame:
         rows.append(evaluate(pred, "score", seed=cfg["seed"], name=f"two-tower + LambdaRank [{split}]"))
         if split == "test":
             per_user_metrics(pred, "score", seed=cfg["seed"]).write_parquet(p.results / "per_user_ranker_test.parquet")
-    # training performance (out-of-fold tower scores and CTR, so comparable with val / test; a user subsample bounds RAM)
+    # Ranker training performance is in-sample, although tower scores and CTR are out-of-fold.
+    # A user subsample bounds RAM; interpret the training score separately from validation/test.
     frac = cfg["ranker"].get("train_eval_user_frac", 0.25)
     pred = predict(cfg, p, booster, names, "train", user_frac=frac)
     rows.insert(0, evaluate(pred, "score", seed=cfg["seed"], name=f"two-tower + LambdaRank [train, {frac:.0%} of users]"))

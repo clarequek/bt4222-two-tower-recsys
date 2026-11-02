@@ -1,4 +1,4 @@
-"""Stage 2b: non-learned baselines on the validation and test slates, read straight from the feature table.
+"""Stage 2b: non-learned baselines on training, validation and test slates from the feature table.
 
 Each baseline ranks a slate by one signal; the ensemble mixes the within-slate percentiles of item popularity and
 BM25 with a weight picked on validation users. All label-based signals (CTR) come from training users only.
@@ -50,6 +50,15 @@ def run(cfg: dict) -> pl.DataFrame:
     for split in ("val", "test"):
         d = df.filter(pl.col("split") == split).with_columns(s=pl.col("pop_pct") + w * pl.col("bm25_pct"))
         rows.append(evaluate(d, "s", seed=cfg["seed"], name=f"Popularity + {w} x BM25 [{split}]"))
+    # Match the ranker's deterministic training-user sample; CTR features are out-of-fold on this split.
+    frac = cfg["ranker"].get("train_eval_user_frac", 0.25)
+    train = features.read(p, columns=cols, splits=["train"], user_frac=frac, seed=cfg["seed"])
+    train = train.with_columns(rand=pl.lit(0.0), pop_pct=_pct("ipop_click_7"), bm25_pct=_pct("lex_bm25"))
+    tag = f"train, {frac:.0%} of users"
+    for name, col in SINGLE.items():
+        rows.append(evaluate(train, col or "rand", seed=cfg["seed"], name=f"{name} [{tag}]"))
+    train = train.with_columns(s=pl.col("pop_pct") + w * pl.col("bm25_pct"))
+    rows.append(evaluate(train, "s", seed=cfg["seed"], name=f"Popularity + {w} x BM25 [{tag}]"))
     save_json(rows, p.results / "baselines.json")
     tbl = results_table(rows)
     log.info("\n" + str(tbl.filter(pl.col("model").str.ends_with("[test]"))))

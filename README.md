@@ -1,4 +1,4 @@
-# JDsearch: query-conditioned two-tower retrieval + LambdaRank re-ranking
+# JDsearch: candidate-conditioned two-tower scoring + LambdaRank re-ranking
 
 BT4222 group project. Given a user's search query on JD.com, the items JD displayed for it and the user's past
 behaviour, rank the displayed items so the ones the user clicks, adds to cart or buys come first.
@@ -6,8 +6,8 @@ Dataset: **JDsearch** (Liu et al., SIGIR 2023, <https://github.com/rucliujn/JDse
 
 The pipeline replaces the previous team's Hybrid NCF + LSTM with:
 
-1. a **two-tower model**: an *item tower* that encodes product content (title/brand/category terms, ids,
-   popularity), and a *query + user tower* that encodes the search query together with the user's history,
+1. a **two-tower model**: an *item tower* that encodes product content (title/brand/category terms and ids),
+   and a *query + user tower* that encodes the search query together with the user's history,
    scored by cosine similarity;
 2. a **LightGBM LambdaRank re-ranker** that combines the tower score with ~100 hand-crafted features.
 
@@ -36,6 +36,11 @@ Everything runs from the command line (`scripts/`) or, stage by stage, from the 
    `harvestingmoon/bt4222-two-tower-recsys`) and set *Runtime → Change runtime type → GPU*.
 3. Run each notebook top to bottom. Its first cell mounts Drive, clones the repository, installs the requirements and
    writes all outputs to `MyDrive/bt4222/outputs/`, so later notebooks (and later sessions) reuse earlier results.
+
+The notebooks reuse one checkout within a Colab runtime and print its commit ID. Record that ID, the configuration,
+and any overrides with each run. Existing Drive outputs may have been created by another revision or configuration:
+the cache checks do not cover every code or configuration change. Use a fresh output directory for a clean run, or
+rebuild all affected stages. Restart the runtime to obtain a fresh checkout of `main`.
 
 | notebook | stages | runtime |
 |---|---|---|
@@ -169,7 +174,8 @@ platform rules. For older history, "no click" is primarily a coverage gap, not e
   `order_7`, `order_90`, `order_365`, `follow_90`) plus *days since the last event*; no mixing of types with decay
   weights, no "click ratio" (it is 95% correlated with how much of a user's history falls in the last week);
 - the tower splits the history into three segments, **short (< 7 d, all types), mid (7–90 d, carts/follows/orders),
-  long (≥ 90 d, orders only)**, each pooled by its own query-guided attention;
+  long (≥ 90 d, mostly orders)**. Candidate-aware attention pools the short segment; the mid and long segments
+  contribute counts and match features;
 - `02d_window_ablation.py` tests the choice: the same ranker trained on windowed vs naive (all-history, decayed,
   ratio) history features.
 
@@ -190,15 +196,24 @@ platform rules. For older history, "no click" is primarily a coverage gap, not e
   scored by the `full` tower. Five folds keep out-of-fold features close to the all-training regime the ranker sees at
   validation/test time. Otherwise the ranker would learn to trust an over-fitted tower score.
 
+**Evaluation scope.** Shared popularity and query-history tables use histories from all users, including evaluation
+users, and tower auxiliary training also samples their historical events. Final-slate labels from validation/test users
+are not used for fitting, apart from validation-based model selection. This is a transductive offline evaluation;
+because the data contain relative rather than global timestamps, it does not establish that every cross-user event
+would have been available at prediction time. The ranker's training metric is in-sample for the ranker even though its
+tower and CTR inputs are out-of-fold. Current saved baseline results do not include training metrics for every model.
+
 **Two-tower model** (`src/jds/twotower/`).
 - *Item tower*: mean term embeddings of title (20 terms), brand (4) and category L3+L4 names (6); embeddings of brand,
-  shop and 4 category ids; popularity buckets of clicks (7 d), carts (90 d) and orders (365 d); MLP → 128-d. No item-id
-  embedding (most displayed items are cold).
+  shop and 4 category ids; MLP → 128-d. No item-id embedding (most displayed items are cold). Popularity enters the
+  training score as an explicit offset; it is not an input to the exported item-tower vector.
 - *Query + user tower*: the query shares the term embedding. Each history event = item tower output + event type +
-  log time before the anchor + the query it was issued under. Each segment (short / mid / long, most recent 50 / 30 / 30
-  events) is pooled by query-guided attention with a null slot; the segment sizes enter as a feature; MLP → 128-d.
+  log time before the anchor + the query it was issued under. Candidate-aware attention pools the short segment with a
+  null slot. Per-type counts and candidate match flags summarise the mid and long segments; MLP → 128-d per candidate.
+  Since this user vector depends on the candidate, this implementation scores an existing candidate slate and is not
+  directly usable as a single precomputed query vector for approximate nearest-neighbour retrieval.
 - *Loss*: listwise softmax over each training slate with target ∝ 2^label − 1 (matches the task), plus an auxiliary
-  in-batch softmax on historical (query → item) events from the last 7 days (where the earlier history is complete),
+  in-batch softmax on historical (query → item) events from the last 7 days (earlier click history can still be censored),
   weighted by event type (click 1, cart 2, order 3). Best epoch by validation graded NDCG@10.
 
 **Re-ranker** (`src/jds/ranker/`). LightGBM `lambdarank`, label gain [0, 1, 3, 7], early stopping on validation users,

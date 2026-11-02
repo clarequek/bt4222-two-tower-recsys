@@ -1,7 +1,7 @@
 import polars as pl
 import pytest
 
-from jds import features
+from jds import baselines, features
 from jds.config import paths
 from jds.prepare import load
 
@@ -50,3 +50,11 @@ def test_ctr_is_out_of_fold(tiny_cfg):
     after = features.join_ctr(rows, tables2, g).sort("wid")
     cols = [c for c in base.columns if c.startswith(("ctr_", "gain_", "disp_"))]
     assert base.select(cols).equals(after.select(cols))
+
+
+def test_baselines_report_train_and_test(tiny_cfg, feats):
+    result = baselines.run(tiny_cfg)
+    models = result["model"].to_list()
+    for name in baselines.SINGLE:
+        assert any(m.startswith(name + " [train,") for m in models)
+        assert name + " [test]" in models
