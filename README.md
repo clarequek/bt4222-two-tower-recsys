@@ -89,7 +89,9 @@ Check that the GPU is visible:
 python -c "import torch; print(torch.cuda.is_available(), torch.cuda.get_device_name(0))"
 ```
 
-**Data.** Put the two raw files in `data/raw/` (they are not in git; see [data/raw/README.md](data/raw/README.md)):
+**Data.** Download the raw files from the [team's shared Google Drive folder](https://drive.google.com/drive/folders/1BndBsCZtrcNvvq-NkYt--LMIR-2PHHfu?usp=sharing)
+or the [official JDsearch repository](https://github.com/rucliujn/JDsearch), and put them in `data/raw/`.
+The files are not stored in git; see [data/raw/README.md](data/raw/README.md):
 
 ```
 data/raw/user_behavior_data.txt     0.96 GB
@@ -118,6 +120,19 @@ stage add `--force` to that script, e.g. `python scripts/05_train_ranker.py --fo
 `summary_all_splits.csv`); the step notebooks show every table and figure. To share results, send back `outputs/full/results/`,
 `outputs/full/figures/`, `outputs/full/tower/*_history.json` and `run_full.log` (all small); model files and parquet
 tables are large and can be regenerated.
+
+The saved test results below use the full displayed slates for 17,174 users with at least one positive label:
+
+| model | MRR | NDCG@10 |
+|---|---:|---:|
+| Popularity (all history) | 0.3435 | 0.3525 |
+| Prior team Hybrid NCF + LSTM (fixed) | 0.1708 | 0.1644 |
+| Two-tower | 0.2047 | 0.1822 |
+| Two-tower + LambdaRank | 0.4601 | 0.4596 |
+
+The saved [train / validation / test table](outputs/full/results/summary_all_splits.csv) also includes baseline
+training metrics. The ranker and baseline training rows score a 25% sample of training users; the ranker and prior NCF
+training metrics are in-sample. This evaluation sample is distinct from the fraction used to fit the ranker.
 
 ---
 
@@ -201,7 +216,8 @@ users, and tower auxiliary training also samples their historical events. Final-
 are not used for fitting, apart from validation-based model selection. This is a transductive offline evaluation;
 because the data contain relative rather than global timestamps, it does not establish that every cross-user event
 would have been available at prediction time. The ranker's training metric is in-sample for the ranker even though its
-tower and CTR inputs are out-of-fold. Current saved baseline results do not include training metrics for every model.
+tower and CTR inputs are out-of-fold. Training rows for the prior NCF are also in-sample; the tower's training row
+uses out-of-fold scores.
 
 **Two-tower model** (`src/jds/twotower/`).
 - *Item tower*: mean term embeddings of title (20 terms), brand (4) and category L3+L4 names (6); embeddings of brand,
@@ -305,7 +321,7 @@ src/jds/
   eda.py, diagnostics.py
 notebooks/          step1_data_preprocess_eda … step7_diagnostics (Colab-ready, one per stage)
 tests/              unit tests on a synthetic raw dataset (run by smoke_test.sh)
-outputs/            everything produced (git-ignored)
+outputs/            generated data and models (git-ignored); saved full-run results and figures are tracked
 ```
 
 ---
