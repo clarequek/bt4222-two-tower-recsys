@@ -8,6 +8,7 @@ OMP_NUM_THREADS=1 "$PY" -m pytest -q   # torch + lightgbm each bundle OpenMP: mu
 rm -rf outputs/sample_2000
 PYTHON="$PY" bash scripts/run_all.sh configs/smoke.yaml
 "$PY" scripts/07_diagnostics.py --config configs/smoke.yaml --parts ablations
+"$PY" scripts/08_no_tower_ablation.py --config configs/smoke.yaml --window-ci --n-boot 50
 "$PY" scripts/03_train_tower.py --config configs/smoke.yaml --variant no_history
 "$PY" scripts/04_score_tower.py --config configs/smoke.yaml --variant no_history
 echo "SMOKE TEST PASSED"

@@ -236,6 +236,7 @@ All outputs go to `outputs/<scope>/` (`full`, or `sample_<N>` for a user subsamp
 | `05_train_ranker.py` | LambdaRank on ~137k training slates | `ranker/ranker.txt`, `results/ranker_feature_importance.csv` | CPU: est. 10–30 min, ~15 GB RAM |
 | `06_predict.py` | re-rank val/test (+ 25% of training users for training performance), final tables | `predictions/ranker_{val,test}.parquet`, `results/ranker.json`, `results/summary_test.csv`, `results/summary_all_splits.csv` | ~2 min |
 | `07_diagnostics.py` | segments, behavioural insights, SHAP, tower attention (+ `--parts ablations`: 11 rankers on 30% of users) | `results/diag_*`, `figures/diag_segments.png`, `figures/diag_shap.png` | ~5 min (+ ~1 h with ablations) |
+| `08_no_tower_ablation.py` (optional) | matched no-tower ranker (final ranker's users and settings, minus the 3 tower features); paired bootstrap 95% CIs vs the final model and popularity (`--window-ci`: also windowed vs naive); no-tower segment metrics; tower attention by event type and recency | `results/no_tower/*` | about one `05_train_ranker.py` run (+ two 30% rankers with `--window-ci`) |
 
 Measured sanity check at full scale (CPU, no tower): a features-only ranker trained on 25% of the training users
 reaches test MRR 0.455 / NDCG@10 0.454, against 0.344 / 0.353 for the best non-learned baseline
@@ -274,7 +275,7 @@ bash scripts/run_all.sh configs/default.yaml --set scope=sample_30000
 ```
 configs/            default.yaml (full run), smoke.yaml (CPU check)
 data/raw/           the two raw files go here (git-ignored)
-scripts/            00_prepare … 07_diagnostics (incl. 02d_window_ablation), run_all.sh, smoke_test.sh
+scripts/            00_prepare … 07_diagnostics (incl. 02d_window_ablation), 08_no_tower_ablation (optional), run_all.sh, smoke_test.sh
 src/jds/
   config.py         config loading (--config / --set), paths, seeding, device, logging
   prepare.py        stage 0

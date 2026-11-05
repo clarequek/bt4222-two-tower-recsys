@@ -5,6 +5,9 @@ outputs/full/*
 # small result tables and figures are committed; data, features and models stay out
 !outputs/full/results/
 !outputs/full/figures/
+# no-tower ablation: keep the CSV/JSON summaries, not the per-user tables or the model file
+outputs/full/results/no_tower/*.parquet
+outputs/full/results/no_tower/*.txt
 outputs_*/
 *.log
 data/raw/*
