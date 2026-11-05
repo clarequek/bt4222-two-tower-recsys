@@ -63,7 +63,7 @@ Self-evaluation table. Fill in effort and effectiveness yourselves.
 |---|---|---|---|
 | 1. Data understanding & features | | | Section 1, window ablation |
 | 2. Prior baseline & gap diagnosis | | | `prior_ncf.json`, `prior_ncf_gaps.json`, prior NCF row in `diag_segments.csv` |
-| 3. Architecture design | | | two-tower with window-aligned segments + cross-fitted LambdaRank; tower ablations `tower_no_history.json`, `tower_no_query.json` |
+| 3. Architecture design | | | two-tower with window-aligned segments + cross-fitted LambdaRank; tower ablations `tower_no_history.json`, `tower_no_query.json`, matched no-tower `no_tower_ablation.csv` |
 | 4. Diagnostics & insights | | | `diag_segments.csv`/`.png`, `diag_insights.csv`, `diag_shap*.csv`, `diag_attention.json`, `diag_ablations.csv` |
 | 5. Smart use of AI | | | AI interaction log (Section 4) |
 

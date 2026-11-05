@@ -267,17 +267,23 @@ All outputs go to `outputs/<scope>/` (`full`, or `sample_<N>` for a user subsamp
 | `05_train_ranker.py` | LambdaRank on ~137k training slates | `ranker/ranker.txt`, `results/ranker_feature_importance.csv` | CPU: est. 10–30 min, ~15 GB RAM |
 | `06_predict.py` | re-rank val/test (+ 25% of training users for training performance), final tables | `predictions/ranker_{val,test}.parquet`, `results/ranker.json`, `results/summary_test.csv`, `results/summary_all_splits.csv` | ~2 min |
 | `07_diagnostics.py` | segments, behavioural insights, SHAP, tower attention (+ `--parts ablations`: 11 rankers on 30% of users) | `results/diag_*`, `figures/diag_segments.png`, `figures/diag_shap.png` | ~5 min (+ ~1 h with ablations) |
+| `08_no_tower_ablation.py` | matched ranker without the three tower-score features (early-stopped and matched-round variants) | `results/no_tower_ablation.{csv,json}`, `figures/no_tower_ablation.png` | CPU: ~8 min |
 
 Measured sanity check at full scale (CPU, no tower): a features-only ranker trained on 25% of the training users
 reaches test MRR 0.455 / NDCG@10 0.454, against 0.344 / 0.353 for the best non-learned baseline
 (popularity). The full run (all users, plus the tower score) should match or beat this; if
 it does not, something is wrong.
 
+Matched no-tower ablation on the final run: **MRR 0.4579 / NDCG@10 0.4575** without the tower score vs
+**0.4601 / 0.4596** with it — the tower adds only **+0.0022 MRR / +0.0021 NDCG@10** beyond the hand-crafted
+features. See `results/no_tower_ablation.csv`.
+
 Optional tower ablations (for the report):
 
 ```bash
 python scripts/03_train_tower.py --variant no_history && python scripts/04_score_tower.py --variant no_history
 python scripts/03_train_tower.py --variant no_query   && python scripts/04_score_tower.py --variant no_query
+python scripts/08_no_tower_ablation.py --config configs/default.yaml
 ```
 
 ---
@@ -305,7 +311,7 @@ bash scripts/run_all.sh configs/default.yaml --set scope=sample_30000
 ```
 configs/            default.yaml (full run), smoke.yaml (CPU check)
 data/raw/           the two raw files go here (git-ignored)
-scripts/            00_prepare … 07_diagnostics (incl. 02d_window_ablation), run_all.sh, smoke_test.sh
+scripts/            00_prepare … 08_no_tower_ablation (incl. 02d_window_ablation), run_all.sh, smoke_test.sh
 src/jds/
   config.py         config loading (--config / --set), paths, seeding, device, logging
   prepare.py        stage 0
