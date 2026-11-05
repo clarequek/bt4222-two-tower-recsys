@@ -137,12 +137,21 @@ class QueryUserTower(nn.Module):
                     ctx: dict) -> torch.Tensor:
         """Exact-match flags per window: same product, same top category as something in that history.
 
-        History padding is row 0 and candidates are real rows (>= 1), so padding never matches."""
+        Padding row 0 and unknown category 0 must never match: one-past-the-end history slots are row 0 with
+        category 0, so comparing raw ids would otherwise mark every item with an unknown category as matching an
+        empty (or partially empty) history. Product matches are safe on row ids, but we still mask padding
+        candidates; category matches additionally require a known candidate category and a real history event.
+        """
         cand_cate = cand_rows[..., CATE1]                              # [B,S]
+        cand_ok = (cand > 0) & (cand_cate > 0)                         # real row, known top category
         out = []
         for s in MATCH_SEGS:
-            out.append((ctx[s]["item"][:, None, :] == cand[:, :, None]).any(-1).to(cand_rows.dtype))
-            out.append((hist_rows[s][..., CATE1][:, None, :] == cand_cate[:, :, None]).any(-1).to(cand_rows.dtype))
+            hist_cate = hist_rows[s][..., CATE1]                       # [B,L]
+            hist_ok = ctx[s]["mask"] & (hist_cate > 0)                 # real event, known top category
+            prod = (ctx[s]["item"][:, None, :] == cand[:, :, None]).any(-1) & cand_ok
+            cate = ((hist_cate[:, None, :] == cand_cate[:, :, None])
+                    & hist_ok[:, None, :] & cand_ok[:, :, None]).any(-1)
+            out += [prod.to(cand_rows.dtype), cate.to(cand_rows.dtype)]
         return torch.stack(out, -1)                                    # [B,S,2*len(MATCH_SEGS)]
 
 

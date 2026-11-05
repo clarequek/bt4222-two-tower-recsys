@@ -165,6 +165,10 @@ def run(cfg: dict) -> pl.DataFrame:
     split_users = {s: users.filter((pl.col("split") == s) & pl.col("has_pos")).select("user_id") for s in ("train", "val", "test")}
     samp = {s: group_lists(sampled.join(u, on="user_id", how="semi")) for s, u in split_users.items()}
     full_test = group_lists(cands.join(split_users["test"], on="user_id", how="semi"))
+    # Same deterministic training-user sample as the ranker, scored on full displayed slates.
+    frac = cfg["ranker"].get("train_eval_user_frac", 0.25)
+    train_eval_users = split_users["train"].filter((pl.col("user_id").hash(seed) % 10_000) < int(frac * 10_000))
+    full_train = group_lists(cands.join(train_eval_users, on="user_id", how="semi"))
 
     # ---- gap diagnosis: structural reasons this model cannot do well on the task (results/prior_ncf_gaps.json)
     ft = full_test
@@ -251,6 +255,8 @@ def run(cfg: dict) -> pl.DataFrame:
     for variant in nc["variants"]:
         model = train(variant)
         sc = "score_maxprob" if variant == "published" else "score_expected"
+        res.append(evaluate(score(model, full_train, variant), sc, seed=seed,
+                            name=f"Prior team Hybrid NCF+LSTM ({variant}) [train, {frac:.0%} of users, in-sample]"))
         s_full = score(model, full_test, variant)
         res.append(evaluate(s_full, sc, seed=seed, name=f"Prior team Hybrid NCF+LSTM ({variant}) [test]"))
         res.append(evaluate(score(model, samp["test"], variant), sc, seed=seed,

@@ -55,7 +55,7 @@ tower:
   grad_clip: 5.0
   aux:                       # auxiliary in-batch softmax on historical (query -> item) pairs
     enabled: true
-    max_age_days: 7          # only anchors inside the click window, where the history before them is complete
+    max_age_days: 7          # anchors inside the click window; older click history can still be censored
     batch: 1024
     weight: 0.5
     every: 2                 # one auxiliary step every N listwise steps

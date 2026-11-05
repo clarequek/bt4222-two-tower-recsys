@@ -1,7 +1,7 @@
 {
   "short": {
     "share_users_with_events": 0.876220703125,
-    "mean_attention_on_events_when_present": 0.5448208699195274
+    "mean_attention_on_events_when_present": 0.5734893321654766
   },
   "mid": {
     "attention": "none (per-type counts only)"

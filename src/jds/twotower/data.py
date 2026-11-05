@@ -262,7 +262,7 @@ class Stores:
         return np.take_along_axis(sl, order, 1), np.take_along_axis(keep, order, 1)
 
     def aux_events(self, max_age: float) -> np.ndarray:
-        """Query-tagged history events inside the click window: anchors whose earlier history is fully recorded."""
+        """Query-tagged events inside the click window; earlier click history can still be censored."""
         return np.flatnonzero((self.h_qid >= 0) & (self.h_age < max_age))
 
 

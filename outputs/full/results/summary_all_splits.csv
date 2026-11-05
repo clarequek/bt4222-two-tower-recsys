@@ -21,13 +21,26 @@ BM25 (query vs item text) [test],0.1096,0.0385,0.0959,0.0938,0.2352,0.1734,0.632
 "User affinity: same category clicked, 7 days [test]",0.1106,0.0353,0.0969,0.095,0.2508,0.1813,0.65,17174
 Popularity + 0.0 x BM25 [val],0.3297,0.1905,0.337,0.3329,0.6337,0.5182,0.8365,17172
 Popularity + 0.0 x BM25 [test],0.3311,0.1915,0.3386,0.334,0.6349,0.5207,0.8403,17174
+"Random [train, 25% of users]",0.1015,0.0314,0.0857,0.0838,0.2279,0.16,0.6077,34514
+"Popularity: users who interacted (all history) [train, 25% of users]",0.3449,0.2015,0.3521,0.3471,0.6545,0.5383,0.8662,34514
+"Popularity: clicks, last 7 days [train, 25% of users]",0.3324,0.1907,0.3381,0.3331,0.6378,0.5191,0.8407,34514
+"Popularity: carts, last 90 days [train, 25% of users]",0.3365,0.197,0.3409,0.3363,0.636,0.5198,0.8473,34514
+"Popularity: orders, last 365 days [train, 25% of users]",0.2945,0.1675,0.2934,0.2893,0.5624,0.4518,0.7928,34514
+"Impression CTR of item (training users) [train, 25% of users]",0.2685,0.1596,0.2576,0.2538,0.4839,0.3789,0.6128,34514
+"Query-item CTR (training users) [train, 25% of users]",0.1858,0.1052,0.166,0.1634,0.33,0.247,0.5881,34514
+"Query-item history engagement (clicks, 7 days) [train, 25% of users]",0.2472,0.1441,0.2353,0.2317,0.446,0.3504,0.7074,34514
+"BM25 (query vs item text) [train, 25% of users]",0.1112,0.0386,0.0968,0.0946,0.2394,0.174,0.6307,34514
+"User affinity: same category clicked, 7 days [train, 25% of users]",0.1122,0.0359,0.0986,0.0966,0.2565,0.1836,0.6471,34514
+"Popularity + 0.0 x BM25 [train, 25% of users]",0.3324,0.1907,0.3381,0.3331,0.6378,0.5191,0.8407,34514
+"Prior team Hybrid NCF+LSTM (fixed) [train, 25% of users, in-sample]",0.1804,0.0804,0.1739,0.1729,0.3876,0.297,0.7325,34514
 Prior team Hybrid NCF+LSTM (fixed) [test],0.1708,0.0734,0.1644,0.1619,0.3706,0.2851,0.7288,17174
 "Prior team Hybrid NCF+LSTM (fixed), their sampled 1:4 lists [reference]",0.5545,0.3378,0.6265,0.6157,0.9926,0.9231,0.9982,17174
+"Prior team Hybrid NCF+LSTM (published) [train, 25% of users, in-sample]",0.1414,0.063,0.1286,0.1266,0.2934,0.2154,0.5329,34514
 Prior team Hybrid NCF+LSTM (published) [test],0.135,0.0597,0.122,0.1195,0.2812,0.2055,0.5286,17174
 "Prior team Hybrid NCF+LSTM (published), their sampled 1:4 lists [reference]",0.4524,0.2429,0.5402,0.5303,0.9787,0.9013,0.9978,17174
-two-tower [train (out-of-fold)],0.2048,0.1221,0.1828,0.1802,0.3562,0.2707,0.7102,137382
-two-tower [val],0.207,0.124,0.1848,0.1828,0.357,0.2726,0.7089,17172
-two-tower [test],0.205,0.1227,0.1827,0.1803,0.3509,0.2689,0.7129,17174
-"two-tower + LambdaRank [train, 25% of users]",0.4847,0.3447,0.4783,0.4728,0.7748,0.6524,0.9272,34514
-two-tower + LambdaRank [val],0.4606,0.3166,0.4599,0.4542,0.7639,0.6434,0.9234,17172
-two-tower + LambdaRank [test],0.4622,0.3182,0.4615,0.4557,0.7633,0.6435,0.9245,17174
+two-tower [train (out-of-fold)],0.2049,0.1224,0.1826,0.18,0.3554,0.2703,0.7106,137382
+two-tower [val],0.2085,0.1254,0.1859,0.1837,0.3586,0.2736,0.7195,17172
+two-tower [test],0.2047,0.1237,0.1822,0.1797,0.3492,0.2674,0.7119,17174
+"two-tower + LambdaRank [train, 25% of users]",0.472,0.3295,0.4678,0.462,0.7671,0.6454,0.9246,34514
+two-tower + LambdaRank [val],0.4581,0.3141,0.4569,0.4513,0.76,0.6394,0.9225,17172
+two-tower + LambdaRank [test],0.4601,0.3165,0.4596,0.4539,0.7613,0.6418,0.9233,17174

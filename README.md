@@ -1,4 +1,4 @@
-# JDsearch: query-conditioned two-tower retrieval + LambdaRank re-ranking
+# JDsearch: candidate-conditioned two-tower scoring + LambdaRank re-ranking
 
 BT4222 group project. Given a user's search query on JD.com, the items JD displayed for it and the user's past
 behaviour, rank the displayed items so the ones the user clicks, adds to cart or buys come first.
@@ -6,8 +6,8 @@ Dataset: **JDsearch** (Liu et al., SIGIR 2023, <https://github.com/rucliujn/JDse
 
 The pipeline replaces the previous team's Hybrid NCF + LSTM with:
 
-1. a **two-tower model**: an *item tower* that encodes product content (title/brand/category terms, ids,
-   popularity), and a *query + user tower* that encodes the search query together with the user's history,
+1. a **two-tower model**: an *item tower* that encodes product content (title/brand/category terms and ids),
+   and a *query + user tower* that encodes the search query together with the user's history,
    scored by cosine similarity;
 2. a **LightGBM LambdaRank re-ranker** that combines the tower score with ~100 hand-crafted features.
 
@@ -36,6 +36,11 @@ Everything runs from the command line (`scripts/`) or, stage by stage, from the 
    `harvestingmoon/bt4222-two-tower-recsys`) and set *Runtime → Change runtime type → GPU*.
 3. Run each notebook top to bottom. Its first cell mounts Drive, clones the repository, installs the requirements and
    writes all outputs to `MyDrive/bt4222/outputs/`, so later notebooks (and later sessions) reuse earlier results.
+
+The notebooks reuse one checkout within a Colab runtime and print its commit ID. Record that ID, the configuration,
+and any overrides with each run. Existing Drive outputs may have been created by another revision or configuration:
+the cache checks do not cover every code or configuration change. Use a fresh output directory for a clean run, or
+rebuild all affected stages. Restart the runtime to obtain a fresh checkout of `main`.
 
 | notebook | stages | runtime |
 |---|---|---|
@@ -84,7 +89,9 @@ Check that the GPU is visible:
 python -c "import torch; print(torch.cuda.is_available(), torch.cuda.get_device_name(0))"
 ```
 
-**Data.** Put the two raw files in `data/raw/` (they are not in git; see [data/raw/README.md](data/raw/README.md)):
+**Data.** Download the raw files from the [team's shared Google Drive folder](https://drive.google.com/drive/folders/1BndBsCZtrcNvvq-NkYt--LMIR-2PHHfu?usp=sharing)
+or the [official JDsearch repository](https://github.com/rucliujn/JDsearch), and put them in `data/raw/`.
+The files are not stored in git; see [data/raw/README.md](data/raw/README.md):
 
 ```
 data/raw/user_behavior_data.txt     0.96 GB
@@ -113,6 +120,19 @@ stage add `--force` to that script, e.g. `python scripts/05_train_ranker.py --fo
 `summary_all_splits.csv`); the step notebooks show every table and figure. To share results, send back `outputs/full/results/`,
 `outputs/full/figures/`, `outputs/full/tower/*_history.json` and `run_full.log` (all small); model files and parquet
 tables are large and can be regenerated.
+
+The saved test results below use the full displayed slates for 17,174 users with at least one positive label:
+
+| model | MRR | NDCG@10 |
+|---|---:|---:|
+| Popularity (all history) | 0.3435 | 0.3525 |
+| Prior team Hybrid NCF + LSTM (fixed) | 0.1708 | 0.1644 |
+| Two-tower | 0.2047 | 0.1822 |
+| Two-tower + LambdaRank | 0.4601 | 0.4596 |
+
+The saved [train / validation / test table](outputs/full/results/summary_all_splits.csv) also includes baseline
+training metrics. The ranker and baseline training rows score a 25% sample of training users; the ranker and prior NCF
+training metrics are in-sample. This evaluation sample is distinct from the fraction used to fit the ranker.
 
 ---
 
@@ -169,7 +189,8 @@ platform rules. For older history, "no click" is primarily a coverage gap, not e
   `order_7`, `order_90`, `order_365`, `follow_90`) plus *days since the last event*; no mixing of types with decay
   weights, no "click ratio" (it is 95% correlated with how much of a user's history falls in the last week);
 - the tower splits the history into three segments, **short (< 7 d, all types), mid (7–90 d, carts/follows/orders),
-  long (≥ 90 d, orders only)**, each pooled by its own query-guided attention;
+  long (≥ 90 d, mostly orders)**. Candidate-aware attention pools the short segment; the mid and long segments
+  contribute counts and match features;
 - `02d_window_ablation.py` tests the choice: the same ranker trained on windowed vs naive (all-history, decayed,
   ratio) history features.
 
@@ -190,15 +211,25 @@ platform rules. For older history, "no click" is primarily a coverage gap, not e
   scored by the `full` tower. Five folds keep out-of-fold features close to the all-training regime the ranker sees at
   validation/test time. Otherwise the ranker would learn to trust an over-fitted tower score.
 
+**Evaluation scope.** Shared popularity and query-history tables use histories from all users, including evaluation
+users, and tower auxiliary training also samples their historical events. Final-slate labels from validation/test users
+are not used for fitting, apart from validation-based model selection. This is a transductive offline evaluation;
+because the data contain relative rather than global timestamps, it does not establish that every cross-user event
+would have been available at prediction time. The ranker's training metric is in-sample for the ranker even though its
+tower and CTR inputs are out-of-fold. Training rows for the prior NCF are also in-sample; the tower's training row
+uses out-of-fold scores.
+
 **Two-tower model** (`src/jds/twotower/`).
 - *Item tower*: mean term embeddings of title (20 terms), brand (4) and category L3+L4 names (6); embeddings of brand,
-  shop and 4 category ids; popularity buckets of clicks (7 d), carts (90 d) and orders (365 d); MLP → 128-d. No item-id
-  embedding (most displayed items are cold).
+  shop and 4 category ids; MLP → 128-d. No item-id embedding (most displayed items are cold). Popularity enters the
+  training score as an explicit offset; it is not an input to the exported item-tower vector.
 - *Query + user tower*: the query shares the term embedding. Each history event = item tower output + event type +
-  log time before the anchor + the query it was issued under. Each segment (short / mid / long, most recent 50 / 30 / 30
-  events) is pooled by query-guided attention with a null slot; the segment sizes enter as a feature; MLP → 128-d.
+  log time before the anchor + the query it was issued under. Candidate-aware attention pools the short segment with a
+  null slot. Per-type counts and candidate match flags summarise the mid and long segments; MLP → 128-d per candidate.
+  Since this user vector depends on the candidate, this implementation scores an existing candidate slate and is not
+  directly usable as a single precomputed query vector for approximate nearest-neighbour retrieval.
 - *Loss*: listwise softmax over each training slate with target ∝ 2^label − 1 (matches the task), plus an auxiliary
-  in-batch softmax on historical (query → item) events from the last 7 days (where the earlier history is complete),
+  in-batch softmax on historical (query → item) events from the last 7 days (earlier click history can still be censored),
   weighted by event type (click 1, cart 2, order 3). Best epoch by validation graded NDCG@10.
 
 **Re-ranker** (`src/jds/ranker/`). LightGBM `lambdarank`, label gain [0, 1, 3, 7], early stopping on validation users,
@@ -236,18 +267,23 @@ All outputs go to `outputs/<scope>/` (`full`, or `sample_<N>` for a user subsamp
 | `05_train_ranker.py` | LambdaRank on ~137k training slates | `ranker/ranker.txt`, `results/ranker_feature_importance.csv` | CPU: est. 10–30 min, ~15 GB RAM |
 | `06_predict.py` | re-rank val/test (+ 25% of training users for training performance), final tables | `predictions/ranker_{val,test}.parquet`, `results/ranker.json`, `results/summary_test.csv`, `results/summary_all_splits.csv` | ~2 min |
 | `07_diagnostics.py` | segments, behavioural insights, SHAP, tower attention (+ `--parts ablations`: 11 rankers on 30% of users) | `results/diag_*`, `figures/diag_segments.png`, `figures/diag_shap.png` | ~5 min (+ ~1 h with ablations) |
-| `08_no_tower_ablation.py` (optional) | matched no-tower ranker (final ranker's users and settings, minus the 3 tower features); paired bootstrap 95% CIs vs the final model and popularity (`--window-ci`: also windowed vs naive); no-tower segment metrics; tower attention by event type and recency | `results/no_tower/*` | about one `05_train_ranker.py` run (+ two 30% rankers with `--window-ci`) |
+| `08_no_tower_ablation.py` | matched ranker without the three tower-score features (early-stopped and matched-round variants) | `results/no_tower_ablation.{csv,json}`, `figures/no_tower_ablation.png` | CPU: ~8 min |
 
 Measured sanity check at full scale (CPU, no tower): a features-only ranker trained on 25% of the training users
 reaches test MRR 0.455 / NDCG@10 0.454, against 0.344 / 0.353 for the best non-learned baseline
 (popularity). The full run (all users, plus the tower score) should match or beat this; if
 it does not, something is wrong.
 
+Matched no-tower ablation on the final run: **MRR 0.4579 / NDCG@10 0.4575** without the tower score vs
+**0.4601 / 0.4596** with it — the tower adds only **+0.0022 MRR / +0.0021 NDCG@10** beyond the hand-crafted
+features. See `results/no_tower_ablation.csv`.
+
 Optional tower ablations (for the report):
 
 ```bash
 python scripts/03_train_tower.py --variant no_history && python scripts/04_score_tower.py --variant no_history
 python scripts/03_train_tower.py --variant no_query   && python scripts/04_score_tower.py --variant no_query
+python scripts/08_no_tower_ablation.py --config configs/default.yaml
 ```
 
 ---
@@ -275,7 +311,7 @@ bash scripts/run_all.sh configs/default.yaml --set scope=sample_30000
 ```
 configs/            default.yaml (full run), smoke.yaml (CPU check)
 data/raw/           the two raw files go here (git-ignored)
-scripts/            00_prepare … 07_diagnostics (incl. 02d_window_ablation), 08_no_tower_ablation (optional), run_all.sh, smoke_test.sh
+scripts/            00_prepare … 08_no_tower_ablation (incl. 02d_window_ablation), run_all.sh, smoke_test.sh
 src/jds/
   config.py         config loading (--config / --set), paths, seeding, device, logging
   prepare.py        stage 0
@@ -291,7 +327,7 @@ src/jds/
   eda.py, diagnostics.py
 notebooks/          step1_data_preprocess_eda … step7_diagnostics (Colab-ready, one per stage)
 tests/              unit tests on a synthetic raw dataset (run by smoke_test.sh)
-outputs/            everything produced (git-ignored)
+outputs/            generated data and models (git-ignored); saved full-run results and figures are tracked
 ```
 
 ---

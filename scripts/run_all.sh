@@ -27,6 +27,7 @@ run 03_train_tower.py   ${ARGS[@]+"${ARGS[@]}"}
 run 04_score_tower.py   ${ARGS[@]+"${ARGS[@]}"}
 run 05_train_ranker.py  ${ARGS[@]+"${ARGS[@]}"}
 run 06_predict.py       ${ARGS[@]+"${ARGS[@]}"}
+run 08_no_tower_ablation.py ${ARGS[@]+"${ARGS[@]}"}
 run 07_diagnostics.py   ${ARGS[@]+"${ARGS[@]}"}
 echo ""
 echo "done. results in outputs/<scope>/results (summary_test.csv), figures in outputs/<scope>/figures"

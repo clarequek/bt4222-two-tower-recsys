@@ -1,11 +1,11 @@
 group,mean_abs_shap
-impression CTR (out-of-fold),0.8711274760433579
-popularity (per type window),0.8278130030309743
-slate context,0.7324328226152194
-query -> item history (all users),0.4716961832611315
-personal history (per type window),0.28479610425229895
-lexical,0.2506923918956506
-two-tower score,0.08885457907216793
-user activity,0.08320265204327822
-item content,0.05549793215853885
-similar past queries,0.00536484318016716
+impression CTR (out-of-fold),0.794042409793509
+popularity (per type window),0.771539383207261
+slate context,0.6808475814984438
+query -> item history (all users),0.4493320366601744
+personal history (per type window),0.2581252998118718
+lexical,0.23253302932969894
+two-tower score,0.09022378310126841
+user activity,0.059130173580106075
+item content,0.03941820753735225
+similar past queries,0.0026841459110840205

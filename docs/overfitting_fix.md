@@ -1,4 +1,4 @@
-# Overfitting: diagnosis, fix and latest full run
+# Overfitting and match-flag fixes: diagnosis and latest full run
 
 ## What was overfitting
 
@@ -7,9 +7,9 @@ The latest code had already fixed the two-tower overfit (train out-of-fold was *
 
 | model | train | val | test | train − test |
 |---|---|---|---|---|
-| two-tower NDCG@10 | 0.1828 (OOF) | 0.1848 | 0.1827 | 0.000 |
-| re-ranker NDCG@10 | 0.4783 | 0.4599 | 0.4615 | **0.0168** |
-| re-ranker MRR | 0.4847 | 0.4606 | 0.4622 | **0.0225** |
+| two-tower NDCG@10 | 0.1826 (OOF) | 0.1859 | 0.1822 | 0.000 |
+| re-ranker NDCG@10 | 0.4678 | 0.4569 | 0.4596 | **0.0082** |
+| re-ranker MRR | 0.4720 | 0.4581 | 0.4601 | **0.0119** |
 
 (The previous run had a train − test NDCG gap of **0.032** and MRR gap of **0.042**.)
 
@@ -39,9 +39,9 @@ The latest code had already fixed the two-tower overfit (train out-of-fold was *
 
 | split | MRR | NDCG@10 |
 |---|---|---|
-| train (out-of-fold) | 0.2048 | 0.1828 |
-| val | 0.2070 | 0.1848 |
-| test | 0.2050 | 0.1827 |
+| train (out-of-fold) | 0.2049 | 0.1826 |
+| val | 0.2085 | 0.1859 |
+| test | 0.2047 | 0.1822 |
 
 Train ≈ val ≈ test: the tower is **not overfitting**. Every fold's validation gNDCG@10 improved monotonically through
 epoch 1 (e.g. fold3: 0.1638 → 0.1758 → 0.1829 → 0.1830).
@@ -50,13 +50,14 @@ epoch 1 (e.g. fold3: 0.1638 → 0.1758 → 0.1829 → 0.1830).
 
 | split | MRR | P@1 | NDCG@10 | gNDCG@10 | HR@10 | R@10 | R@50 |
 |---|---|---|---|---|---|---|---|
-| train | 0.4847 | 0.3447 | 0.4783 | — | 0.7748 | 0.6524 | 0.9272 |
-| val | 0.4606 | 0.3166 | 0.4599 | — | 0.7639 | 0.6434 | 0.9234 |
-| **test** | **0.4622** | **0.3182** | **0.4615** | **0.4557** | **0.7633** | **0.6435** | **0.9245** |
+| train | 0.4720 | 0.3295 | 0.4678 | 0.4620 | 0.7671 | 0.6454 | 0.9246 |
+| val | 0.4581 | 0.3141 | 0.4569 | 0.4513 | 0.7600 | 0.6394 | 0.9225 |
+| **test** | **0.4601** | **0.3165** | **0.4596** | **0.4539** | **0.7613** | **0.6418** | **0.9233** |
 
-Against the pre-fix run: test NDCG@10 **0.4601 → 0.4615**, MRR **0.4609 → 0.4622**, while the train–test gap
-roughly halved. The latest numbers include the hard-negative leak fix (hard negatives only from the model's own
-training users, label-0 items only).
+Against the previous run (v6): test NDCG@10 **0.4615 → 0.4596**, MRR **0.4622 → 0.4601**. The small drop comes
+from the category-match fix removing a spurious signal; the train–test gap also fell from **0.0168 → 0.0082**
+(NDCG) and **0.0225 → 0.0119** (MRR), so the model is less overfit. The latest numbers include both the
+hard-negative leak fix and the match-flag fix.
 
 ### Baselines (test)
 
@@ -64,23 +65,49 @@ training users, label-0 items only).
 |---|---|---|
 | Popularity (all history) | 0.3435 | 0.3525 |
 | Prior team NCF+LSTM (fixed) | 0.1708 | 0.1644 |
-| Two-tower only | 0.2050 | 0.1827 |
-| **Two-tower + LambdaRank** | **0.4622** | **0.4615** |
+| Two-tower only | 0.2047 | 0.1822 |
+| **Two-tower + LambdaRank** | **0.4601** | **0.4596** |
+
+## Category-match fix (v7)
+
+`QueryUserTower.match_flags` compared raw category ids. Padding history slots are item row 0, whose category is
+0, so a candidate with an unknown category (`cate_id_1 == 0`) was marked as matching an empty or partially empty
+history. The same happened when a real history event had an unknown category.
+
+Fix: product flags require a real candidate (`cand > 0`); category flags require both a known candidate category
+and a valid history event with a known category. A regression test covers padding, empty history and unknown
+categories. Validation/test remain otherwise unchanged (same features, splits and ranker settings).
+
+## Matched no-tower ablation (v7)
+
+Same users, hand-crafted features and LambdaRank parameters; only `tower_score`, `tower_score_pct` and
+`tower_score_gap` are removed. The no-tower ranker early-stops at 718 rounds (the with-tower ranker at 860).
+
+| model | test MRR | test NDCG@10 |
+|---|---|---|
+| two-tower + LambdaRank | **0.4601** | **0.4596** |
+| LambdaRank, no tower (early / matched rounds) | 0.4579 | 0.4575 |
+| **tower contribution** | **+0.0022** | **+0.0021** |
+
+The tower adds only ~0.002 beyond the hand-crafted features. That is an honest limitation of the current
+two-tower design: most of the ranking signal is already in the windowed history, popularity, CTR and slate
+features, and the exported cosine is deliberately popularity-free. The tower is not the main driver of the
+final score in this slate re-ranking setup.
 
 ## Why 0.9 is not reachable
 
 The test slates average 89.2 items with 1.86 positives; 97.7 % of labels are 0 and 23.6 % of users have no positive
 in the model's top 10. Oracle bounds: perfect ordering of the current top-10 gives MRR 0.7736 / NDCG@10 0.6666;
 top-50 gives 0.9705 / 0.9365; the whole slate gives 1.0 / 1.0. A 0.9 headline is therefore only available through
-metrics that match the sparsity, e.g. **recall@50 = 0.9235** or **HR@50 = 0.970**.
+metrics that match the sparsity, e.g. **recall@50 = 0.9233** or **HR@50 = 0.970**.
 
 ## Reproduce
 
 ```bash
-.venv/bin/python scripts/00_prepare.py --set paths.work_dir=outputs_v5
-.venv/bin/python scripts/02_features.py --set paths.work_dir=outputs_v5
-.venv/bin/python scripts/03_train_tower.py --set paths.work_dir=outputs_v5
-.venv/bin/python scripts/04_score_tower.py --set paths.work_dir=outputs_v5
-.venv/bin/python scripts/05_train_ranker.py --set paths.work_dir=outputs_v5
-.venv/bin/python scripts/06_predict.py --set paths.work_dir=outputs_v5
+.venv/bin/python scripts/00_prepare.py --set paths.work_dir=outputs_v7
+.venv/bin/python scripts/02_features.py --set paths.work_dir=outputs_v7
+.venv/bin/python scripts/03_train_tower.py --set paths.work_dir=outputs_v7
+.venv/bin/python scripts/04_score_tower.py --set paths.work_dir=outputs_v7
+.venv/bin/python scripts/05_train_ranker.py --set paths.work_dir=outputs_v7
+.venv/bin/python scripts/06_predict.py --set paths.work_dir=outputs_v7
 ```

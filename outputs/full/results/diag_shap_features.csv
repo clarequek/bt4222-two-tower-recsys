@@ -1,109 +1,109 @@
 feature,mean_abs_shap,group
-slate_len,0.29788990470016025,slate context
-qpop_wid_click_7_pct,0.24091269634706938,query -> item history (all users)
-ipop_users,0.23391833575518886,popularity (per type window)
-slate_share_shop_id,0.18943019952505671,slate context
-slate_share_brand_id,0.16442048774685583,slate context
-ctr_shop_id,0.1388564210509242,impression CTR (out-of-fold)
-ctr_wid_pct,0.12255989954675518,impression CTR (out-of-fold)
-ipop_click_7_pct,0.11365683698168455,popularity (per type window)
-lex_bm25,0.10747849447623951,lexical
-ipop_cart_90,0.10336583046156626,popularity (per type window)
-ctr_q_wid_pct,0.09796654313335322,impression CTR (out-of-fold)
-disp_q_brand_id,0.09667546172391585,impression CTR (out-of-fold)
-disp_wid,0.09304230347565423,impression CTR (out-of-fold)
-ipop_order_365_pct,0.0899101304846827,popularity (per type window)
-slate_share_cate_id_4,0.08069223064314655,slate context
-tower_score_gap,0.07024356260912828,two-tower score
-u_shop_id_last_days,0.06731846519045041,personal history (per type window)
-qpop_wid_cart_90,0.05708172494326267,query -> item history (all users)
-item_name_len,0.05544187868367454,item content
-apop_shop_id_cart_90,0.05136398139837534,popularity (per type window)
-u_cate_id_4_last_days,0.050305937797969616,personal history (per type window)
-apop_shop_id_click_7,0.049806885484087494,popularity (per type window)
-disp_shop_id,0.04973636679605931,impression CTR (out-of-fold)
-u_brand_id_last_days,0.045505258419979926,personal history (per type window)
-ctr_wid,0.04463693876574448,impression CTR (out-of-fold)
-ipop_click_7,0.04403911688057165,popularity (per type window)
-lex_cover,0.03971611224777589,lexical
-lex_bm25_pct,0.038095983860966055,lexical
-disp_brand_id,0.03584238927544418,impression CTR (out-of-fold)
-lex_name_cover,0.03538348125320032,lexical
-apop_shop_id_order_365,0.03484655352447252,popularity (per type window)
-ctr_q_brand_id,0.03451611500475776,impression CTR (out-of-fold)
-qpop_brand_id_cart_90,0.03425087052827452,query -> item history (all users)
-ua_gap_days,0.030655229257236398,user activity
-lex_cover_idf,0.030018320057468836,lexical
-qpop_cate_id_4_click_7,0.02840089632365595,query -> item history (all users)
-ctr_q_cate_id_4,0.026876205203402677,impression CTR (out-of-fold)
-qpop_cate_id_4_cart_90,0.02518080856744902,query -> item history (all users)
-qpop_cate_id_4_order_365,0.02411985917588857,query -> item history (all users)
-qpop_wid_order_365,0.023515006907565666,query -> item history (all users)
-qpop_brand_id_click_7,0.023456769305099975,query -> item history (all users)
-u_wid_last_days,0.023344765280421762,personal history (per type window)
-u_cate_id_4_click_7_pct,0.022959694926745357,personal history (per type window)
-u_cate_id_4_cart_90,0.022728488098694107,personal history (per type window)
-ctr_brand_id,0.021281033375697696,impression CTR (out-of-fold)
-gain_wid,0.019866447968011527,impression CTR (out-of-fold)
-disp_q_cate_id_4,0.01949761717844769,impression CTR (out-of-fold)
-gain_shop_id,0.018078697395583813,impression CTR (out-of-fold)
-u_brand_id_cart_90,0.017886494245737846,personal history (per type window)
-apop_cate_id_4_cart_90,0.016310376241214616,popularity (per type window)
-ctr_cate_id_4,0.015950675339379255,impression CTR (out-of-fold)
-ua_order_365,0.015258263466475104,user activity
-apop_brand_id_cart_90,0.015097547292742847,popularity (per type window)
-ipop_order_365,0.014513053841341625,popularity (per type window)
-ua_cart_90,0.01312632048973429,user activity
-tower_score_pct,0.013005357404564969,two-tower score
-apop_cate_id_4_order_365,0.012826329565668875,popularity (per type window)
-apop_cate_id_4_click_7,0.012124296256047346,popularity (per type window)
-ua_order_90,0.011452259453903673,user activity
-apop_brand_id_click_7,0.011265283804281732,popularity (per type window)
-ipop_cart_7,0.011026125126840895,popularity (per type window)
-qpop_brand_id_order_365,0.010857788939260208,query -> item history (all users)
-disp_q_wid,0.010391992499290743,impression CTR (out-of-fold)
-u_brand_id_click_7,0.009772589835803234,personal history (per type window)
-disp_cate_id_4,0.007248370421026788,impression CTR (out-of-fold)
-apop_brand_id_order_365,0.0065125563609653445,popularity (per type window)
-ipop_order_90,0.005791271279259219,popularity (per type window)
-u_brand_id_order_365,0.005767621721492814,personal history (per type window)
-tower_score,0.005605659058474671,two-tower score
-u_shop_id_cart_90,0.005533267321941715,personal history (per type window)
-gain_cate_id_4,0.005326289485013131,impression CTR (out-of-fold)
-ua_hist_len,0.004852626837802749,user activity
-ctr_q_wid,0.004826203074634267,impression CTR (out-of-fold)
-u_cate_id_4_click_7,0.004448945274791818,personal history (per type window)
-qpop_wid_click_7,0.003919762223605509,query -> item history (all users)
-ua_first_age_days,0.003821692574132443,user activity
-u_wid_click_7,0.003074007139368508,personal history (per type window)
-gain_brand_id,0.002907820311748867,impression CTR (out-of-fold)
-u_shop_id_click_7,0.002778140065265952,personal history (per type window)
-gain_q_wid,0.0020163443766345107,impression CTR (out-of-fold)
-gain_q_brand_id,0.0015370260073970736,impression CTR (out-of-fold)
-gain_q_cate_id_4,0.0014903146344814858,impression CTR (out-of-fold)
-u_shop_id_order_365,0.0014727792743034387,personal history (per type window)
-u_q_max_jac,0.0014599096706201028,similar past queries
-ua_hist_query_share,0.0013999232148575239,user activity
-ua_click_7,0.0013192358123243148,user activity
-ipop_order_7,0.0012312775672888526,popularity (per type window)
-u_simq_wid_n,0.0010425091184695623,similar past queries
-u_q_sim_last_days,0.0008533037843953543,similar past queries
-ua_cart_7,0.000846299849462889,user activity
-u_simq_cate_id_4_deep,0.0007083939475213552,similar past queries
-u_wid_cart_90,0.0006952991820697926,personal history (per type window)
-u_simq_cate_id_4_n,0.0005328961973211705,similar past queries
-u_wid_order_365,0.0005039783033941572,personal history (per type window)
-ua_order_7,0.000447220192334069,user activity
-u_simq_brand_id_n,0.00044247662361799917,similar past queries
-u_cate_id_4_order_365,0.0003488874378801319,personal history (per type window)
-u_simq_brand_id_deep,0.00023986701360457867,similar past queries
-ipop_follow_90,0.00020721472469350835,popularity (per type window)
-u_wid_cart_7,0.00017808822577427668,personal history (per type window)
-u_cart_not_ordered,0.0001235677812216857,personal history (per type window)
-item_has_meta,0.000056053474864306236,item content
-u_q_sim_n,0.00005516083586793583,similar past queries
-u_wid_order_90,0.000048480636655186446,personal history (per type window)
-u_simq_wid_deep,0.00003032598874910122,similar past queries
-ua_follow_90,0.000023580895014763316,user activity
-u_wid_order_7,1.348092337210453e-6,personal history (per type window)
+slate_len,0.2787326187576876,slate context
+qpop_wid_click_7_pct,0.24708642819585874,query -> item history (all users)
+ipop_users,0.21488027346454808,popularity (per type window)
+slate_share_shop_id,0.18712842983857877,slate context
+slate_share_brand_id,0.13986474407871624,slate context
+ctr_shop_id,0.13136436228124276,impression CTR (out-of-fold)
+ipop_click_7_pct,0.1212886706190206,popularity (per type window)
+ctr_wid_pct,0.11947035595305404,impression CTR (out-of-fold)
+ipop_cart_90,0.10022061732602748,popularity (per type window)
+ipop_order_365_pct,0.09516866262034546,popularity (per type window)
+ctr_q_wid_pct,0.09505195543270036,impression CTR (out-of-fold)
+lex_bm25,0.09380930981279198,lexical
+disp_wid,0.08490725692870568,impression CTR (out-of-fold)
+disp_q_brand_id,0.07595481028017784,impression CTR (out-of-fold)
+slate_share_cate_id_4,0.0751217888234612,slate context
+tower_score_gap,0.07190386511315866,two-tower score
+u_shop_id_last_days,0.06772097862466263,personal history (per type window)
+qpop_wid_cart_90,0.0570078157762116,query -> item history (all users)
+lex_bm25_pct,0.04741126988378536,lexical
+disp_shop_id,0.046586784318087264,impression CTR (out-of-fold)
+ipop_click_7,0.045163870691484455,popularity (per type window)
+ctr_wid,0.04264658864007085,impression CTR (out-of-fold)
+u_brand_id_last_days,0.042285224716988694,personal history (per type window)
+u_cate_id_4_last_days,0.041271469710380225,personal history (per type window)
+apop_shop_id_click_7,0.04037832863358428,popularity (per type window)
+apop_shop_id_cart_90,0.03964598418559134,popularity (per type window)
+item_name_len,0.039359569661344955,item content
+lex_cover,0.037227254939625615,lexical
+disp_brand_id,0.03292721290332818,impression CTR (out-of-fold)
+apop_shop_id_order_365,0.03094216543275857,popularity (per type window)
+qpop_brand_id_cart_90,0.030467092607407827,query -> item history (all users)
+ctr_q_brand_id,0.029023546001881274,impression CTR (out-of-fold)
+lex_name_cover,0.028478719223869,lexical
+lex_cover_idf,0.025606475469626976,lexical
+ua_gap_days,0.02495226404058692,user activity
+ctr_q_cate_id_4,0.024526649467043006,impression CTR (out-of-fold)
+qpop_cate_id_4_cart_90,0.024225738077618925,query -> item history (all users)
+u_cate_id_4_click_7_pct,0.023366507106859655,personal history (per type window)
+u_wid_last_days,0.023332683634216905,personal history (per type window)
+qpop_cate_id_4_click_7,0.021576061970036867,query -> item history (all users)
+qpop_wid_order_365,0.021350412678652345,query -> item history (all users)
+qpop_cate_id_4_order_365,0.019501611703546768,query -> item history (all users)
+ctr_brand_id,0.018691924883879392,impression CTR (out-of-fold)
+gain_wid,0.0185863020569952,impression CTR (out-of-fold)
+qpop_brand_id_click_7,0.017553386514185983,query -> item history (all users)
+disp_q_cate_id_4,0.017437872669658825,impression CTR (out-of-fold)
+u_brand_id_cart_90,0.016477309677366627,personal history (per type window)
+gain_shop_id,0.01610123295330426,impression CTR (out-of-fold)
+apop_brand_id_cart_90,0.015759547235377577,popularity (per type window)
+tower_score_pct,0.015219530981146426,two-tower score
+u_cate_id_4_cart_90,0.01325442840260657,personal history (per type window)
+ctr_cate_id_4,0.012488136592332468,impression CTR (out-of-fold)
+apop_brand_id_click_7,0.012330562137826665,popularity (per type window)
+apop_cate_id_4_cart_90,0.011352726158812682,popularity (per type window)
+ipop_cart_7,0.01075372831390346,popularity (per type window)
+ua_order_365,0.010416812255244186,user activity
+ipop_order_365,0.009500025507772469,popularity (per type window)
+ua_cart_90,0.00948594248503067,user activity
+disp_q_wid,0.009342967357538002,impression CTR (out-of-fold)
+apop_cate_id_4_order_365,0.00832154725930871,popularity (per type window)
+qpop_brand_id_order_365,0.008305449936572165,query -> item history (all users)
+u_brand_id_click_7,0.00790761925609813,personal history (per type window)
+ua_order_90,0.007829958632498009,user activity
+apop_cate_id_4_click_7,0.007038379939926361,popularity (per type window)
+disp_cate_id_4,0.006075223686164396,impression CTR (out-of-fold)
+u_brand_id_order_365,0.0058026383150494515,personal history (per type window)
+u_shop_id_cart_90,0.005727788215646236,personal history (per type window)
+apop_brand_id_order_365,0.005150643059237824,popularity (per type window)
+ctr_q_wid,0.0037802886536899387,impression CTR (out-of-fold)
+u_wid_click_7,0.0032490094580583185,personal history (per type window)
+ua_hist_len,0.003218365157144667,user activity
+tower_score,0.0031003870069633236,two-tower score
+ipop_order_90,0.0030246732305998546,popularity (per type window)
+gain_cate_id_4,0.0029791521524543396,impression CTR (out-of-fold)
+u_cate_id_4_click_7,0.002853521874389789,personal history (per type window)
+qpop_wid_click_7,0.002258039200083201,query -> item history (all users)
+u_shop_id_click_7,0.0022434548650683197,personal history (per type window)
+gain_q_wid,0.0020554322151453705,impression CTR (out-of-fold)
+gain_brand_id,0.0016961428570273556,impression CTR (out-of-fold)
+ua_first_age_days,0.0014909885291313364,user activity
+gain_q_brand_id,0.0013745727381431136,impression CTR (out-of-fold)
+u_shop_id_order_365,0.0012632690343671567,personal history (per type window)
+gain_q_cate_id_4,0.0009736387708850881,impression CTR (out-of-fold)
+u_simq_wid_n,0.0009377654793297954,similar past queries
+u_q_max_jac,0.0006147576918864531,similar past queries
+u_wid_cart_90,0.0005785738466024217,personal history (per type window)
+ua_cart_7,0.0005650835635209195,user activity
+ipop_order_7,0.00052167931599479,popularity (per type window)
+u_wid_order_365,0.0004916262865537025,personal history (per type window)
+ua_click_7,0.00048734744600751066,user activity
+u_q_sim_last_days,0.0004536841249946347,similar past queries
+ua_hist_query_share,0.0004494353352030344,user activity
+u_simq_brand_id_n,0.00026837100271424197,similar past queries
+ua_order_7,0.00023397613573882355,user activity
+u_simq_cate_id_4_n,0.00016556063936043025,similar past queries
+u_wid_cart_7,0.00014112891968646107,personal history (per type window)
+u_simq_brand_id_deep,0.00010837699224490077,similar past queries
+ipop_follow_90,0.0000972980751403836,popularity (per type window)
+u_cart_not_ordered,0.00009122410609393586,personal history (per type window)
+u_simq_cate_id_4_deep,0.00006782630428172855,similar past queries
+u_q_sim_n,0.000060553844625966045,similar past queries
+item_has_meta,0.00005863787600729512,item content
+u_wid_order_90,0.000048375199281422964,personal history (per type window)
+u_cate_id_4_order_365,0.0000184685618951861,personal history (per type window)
+u_simq_wid_deep,7.249831645869742e-6,similar past queries
+u_wid_order_7,0.0,personal history (per type window)
 u_wid_follow_90,0.0,personal history (per type window)
+ua_follow_90,0.0,user activity

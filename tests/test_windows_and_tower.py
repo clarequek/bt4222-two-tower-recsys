@@ -4,7 +4,8 @@ import torch
 
 from jds.config import paths
 from jds.prepare import load
-from jds.twotower.data import Stores, time_bucket
+from jds.twotower.data import N_FEAT, Stores, time_bucket
+from jds.twotower.model import CATE1, QueryUserTower
 from jds.twotower.train import inbatch_loss, listwise_loss
 from jds.windows import feature_windows, segment_bounds
 
@@ -60,6 +61,31 @@ def test_hard_negatives_only_from_own_training_slates(tiny_cfg):
     sl = dict(zip(st.s_item[1], st.s_label[1]))
     assert all(sl[i] == 0 for i in neg[0][ok[0]])              # only passed-over products, never a positive
     assert pos[0] not in neg[0][ok[0]]
+
+
+def test_match_flags_ignore_padding_and_unknown_categories():
+    B, S, L = 1, 3, 2
+    segs = ("short", "mid", "long")
+    cand = torch.tensor([[0, 1, 2]])                       # padding, real unknown cate, real known cate
+    cand_rows = torch.zeros(B, S, N_FEAT, dtype=torch.long)
+    cand_rows[0, 1, CATE1] = 0                             # unknown top category
+    cand_rows[0, 2, CATE1] = 7
+    hist_rows = {s: torch.zeros(B, L, N_FEAT, dtype=torch.long) for s in segs}
+    hist_rows["short"][0, 0, CATE1] = 7                    # one real history event, one padding slot
+    ctx = {s: {"item": torch.tensor([[3, 0]]), "mask": torch.tensor([[True, False]])} for s in segs}
+
+    flags = QueryUserTower.match_flags(None, cand_rows, cand, hist_rows, ctx)
+    assert flags[0, 0].sum() == 0                          # padding candidate never matches
+    assert flags[0, 1].sum() == 0                          # unknown category never matches
+    assert flags[0, 2, 0] == 0 and flags[0, 2, 1] == 1     # real product=2 != 3, category 7 matches short only
+    assert flags[0, 2].sum() == 1
+
+    empty = {s: {"item": torch.zeros(B, L, dtype=torch.long),
+                 "mask": torch.zeros(B, L, dtype=torch.bool)} for s in segs}
+    empty_rows = {s: torch.zeros(B, L, N_FEAT, dtype=torch.long) for s in segs}
+    unknown = torch.zeros(B, S, N_FEAT, dtype=torch.long)  # every candidate category is 0
+    flags = QueryUserTower.match_flags(None, unknown, torch.tensor([[1, 2, 3]]), empty_rows, empty)
+    assert flags.abs().sum() == 0
 
 
 def test_listwise_loss_ignores_padding_and_prefers_positive():

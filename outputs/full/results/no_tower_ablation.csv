@@ -1,0 +1,4 @@
+model,mrr,p1,ndcg10,gndcg10,hr10,r10,r50,n_users
+two-tower + LambdaRank [test],0.4601,0.3165,0.4596,0.4539,0.7613,0.6418,0.9233,17174
+"LambdaRank (no tower, early-stopped) [test]",0.4579,0.314,0.4575,0.4517,0.7581,0.6388,0.9226,17174
+"LambdaRank (no tower, matched rounds) [test]",0.4579,0.314,0.4575,0.4517,0.7581,0.6388,0.9226,17174

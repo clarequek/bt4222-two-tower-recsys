@@ -1,13 +1,13 @@
 segment,model,n,mrr,gndcg10
-50-90% older than 7 d,"naive (all-history counts, decay, ratios)",7955,0.466058396392551,0.4617674588439711
-50-90% older than 7 d,no history counts,7955,0.4155925899704398,0.41667415284769965
-50-90% older than 7 d,windowed (pipeline),7955,0.4648003075966515,0.46035286222140903
-50-90% older than 7 d,windowed + naive ratios,7955,0.4649935146221327,0.46051142223796715
-< 50% of history older than 7 d,"naive (all-history counts, decay, ratios)",5058,0.4597390829465122,0.4455365825199334
-< 50% of history older than 7 d,no history counts,5058,0.4071044731027906,0.3997067556987173
-< 50% of history older than 7 d,windowed (pipeline),5058,0.46018596703722575,0.44503729654270663
-< 50% of history older than 7 d,windowed + naive ratios,5058,0.45983727970608956,0.44542652790830833
->= 90% older than 7 d,"naive (all-history counts, decay, ratios)",4161,0.44500364609476245,0.44280556157883405
->= 90% older than 7 d,no history counts,4161,0.4121661401433733,0.41336776123794533
->= 90% older than 7 d,windowed (pipeline),4161,0.44488734668802565,0.442636561182321
->= 90% older than 7 d,windowed + naive ratios,4161,0.4457599673259624,0.44240011921284494
+50-90% older than 7 d,"naive (all-history counts, decay, ratios)",7955,0.46605839639255064,0.461767458843971
+50-90% older than 7 d,no history counts,7955,0.41559258997043963,0.41667415284769954
+50-90% older than 7 d,windowed (pipeline),7955,0.4648003075966515,0.4603528622214088
+50-90% older than 7 d,windowed + naive ratios,7955,0.46499351462213245,0.4605114222379672
+< 50% of history older than 7 d,"naive (all-history counts, decay, ratios)",5058,0.4597390829465124,0.4455365825199334
+< 50% of history older than 7 d,no history counts,5058,0.40710447310279047,0.3997067556987173
+< 50% of history older than 7 d,windowed (pipeline),5058,0.46018596703722575,0.44503729654270635
+< 50% of history older than 7 d,windowed + naive ratios,5058,0.45983727970608973,0.4454265279083083
+>= 90% older than 7 d,"naive (all-history counts, decay, ratios)",4161,0.4450036460947624,0.44280556157883416
+>= 90% older than 7 d,no history counts,4161,0.41216614014337327,0.4133677612379453
+>= 90% older than 7 d,windowed (pipeline),4161,0.4448873466880256,0.4426365611823209
+>= 90% older than 7 d,windowed + naive ratios,4161,0.4457599673259625,0.44240011921284494
